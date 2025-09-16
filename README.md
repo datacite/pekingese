@@ -39,9 +39,9 @@ http://localhost:8080/?client_id=datacite.datacite&present=creators,creators.nam
 
 ## Design Choices
 
-### [Gin](https://gin-gonic.com/en/docs/) (API Framework)
+### [net/http](https://pkg.go.dev/net/http) (Standard library for API routing)
 
-I chose to use Gin because it's a popular framework for building web APIs in Go, and takes care of a lot of the heavy lifting.
+I chose to use the standard `net/http` library because the needs for thes project are minimal. If it needs more features in the future - such as middleware or auth - I would switch to the [Chi](https://go-chi.io/#/) framework
 
 ### [defensestation/osquery](https://github.com/defensestation/osquery) (An idiomatic Go query builder for OpenSearch)
 
