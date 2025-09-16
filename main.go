@@ -1,11 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 	"os"
 	"strings"
-
-	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -17,20 +16,17 @@ var (
 func main() {
 	osClient = InitOpenSearch()
 
-	router := gin.Default()
-
-	router.GET("/", getData)
-
-	router.Run(":8080")
+	http.HandleFunc("/", getData)
+	http.ListenAndServe(":8080", nil)
 }
 
-func getData(c *gin.Context) {
-	query := c.DefaultQuery("query", "")
-	clientId := c.DefaultQuery("client_id", "")
-	providerId := c.DefaultQuery("provider_id", "")
+func getData(response http.ResponseWriter, request *http.Request) {
+	query := request.URL.Query().Get("query")
+	clientId := request.URL.Query().Get("client_id")
+	providerId := request.URL.Query().Get("provider_id")
 
-	fieldsPresent := strings.Split(c.DefaultQuery("present", ""), ",")
-	fieldsDistribution := strings.Split(c.DefaultQuery("distribution", ""), ",")
+	fieldsPresent := strings.Split(request.URL.Query().Get("present"), ",")
+	fieldsDistribution := strings.Split(request.URL.Query().Get("distribution"), ",")
 
 	presentAggs := make([]OSAggregation, 0)
 	for _, field := range fieldsPresent {
@@ -53,5 +49,8 @@ func getData(c *gin.Context) {
 
 	results := Run(search)
 
-	c.IndentedJSON(http.StatusOK, results)
+	response.Header().Set("Content-Type", "application/json")
+	response.WriteHeader(http.StatusOK)
+	json.NewEncoder(response).Encode(results)
 }
+
