@@ -13,6 +13,7 @@ import (
 
 type OSClient = *opensearch.Client
 type OSAggregation = osquery.Aggregation
+type OSResponse = *opensearchapi.SearchResp
 
 func InitOpenSearch() OSClient {
 	osClient, err := opensearch.NewClient(opensearch.Config{
@@ -95,7 +96,7 @@ func buildPresentAggregation(field string) OSAggregation {
 						"field": field,
 					},
 				},
-				"not_present": map[string]any{
+				"absent": map[string]any{
 					"bool": map[string]any{
 						"must_not": map[string]any{
 							"exists": map[string]any{
