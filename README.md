@@ -1,9 +1,11 @@
 # Metadata Completenesss API
+
 API for the Metadata Completeness Dashboard
 
 ## Running Locally
 
 ### Set up OpenSearch Tunnel
+
 The API requires a tunnel into OpenSearch. This can be set up using the instructions here: https://datacite.atlassian.net/wiki/spaces/DAT/pages/1038811137/How+to+SSH+tunnel+to+ElasticSearch.
 
 You may need to prepend `0.0.0.0` to your local forward in the `.ssh/config` to allow Docker to connect to OpenSearch:
@@ -22,18 +24,18 @@ Host es-stage
 ### Using the API
 
 The API is served on `http://localhost:8080/`<br>
-*Currently there is only one endpoint at the root*
+_Currently there is only one endpoint at the root_
 
 Example URL that fetches `present` and `distribution` aggregations for DataCite, along with a test query:<br>
 http://localhost:8080/?client_id=datacite.datacite&present=creators,creators.name&distribution=types.resourceTypeGeneral&query=test
 
-***Supported Query Parameters***
+**_Supported Query Parameters_**
 
 - `client_id`: string
 - `provider_id`: string
 - `query`: string
-- `present`: []string - *comma separated list of fields for which to fetch the present/not_present counts*
-- `distribution`: []string - *comma separated list of fields for which to fetch the distribution values*
+- `present`: []string - _comma separated list of fields for which to fetch the present/absent counts_
+- `distribution`: []string - _comma separated list of fields for which to fetch the distribution values_
 
 ---
 

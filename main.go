@@ -21,6 +21,7 @@ func main() {
 }
 
 func getData(response http.ResponseWriter, request *http.Request) {
+	// Parse query parameters
 	query := request.URL.Query().Get("query")
 	clientId := request.URL.Query().Get("client_id")
 	providerId := request.URL.Query().Get("provider_id")
@@ -28,6 +29,7 @@ func getData(response http.ResponseWriter, request *http.Request) {
 	fieldsPresent := strings.Split(request.URL.Query().Get("present"), ",")
 	fieldsDistribution := strings.Split(request.URL.Query().Get("distribution"), ",")
 
+	// Build aggregation slices and query
 	presentAggs := make([]OSAggregation, 0)
 	for _, field := range fieldsPresent {
 		if field != "" {
@@ -47,10 +49,15 @@ func getData(response http.ResponseWriter, request *http.Request) {
 		Aggs(presentAggs...).
 		Aggs(distributionAggs...)
 
-	results := Run(search)
+	// Execute search and returned parsed openSearchResponse
+	openSearchResponse := Run(search)
+	apiResponse, err := ParseSearchResp(openSearchResponse)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	response.Header().Set("Content-Type", "application/json")
 	response.WriteHeader(http.StatusOK)
-	json.NewEncoder(response).Encode(results)
+	json.NewEncoder(response).Encode(apiResponse)
 }
-
