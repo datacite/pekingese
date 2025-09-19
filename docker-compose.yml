@@ -15,6 +15,9 @@ services:
     # depends_on:
     #   elasticsearch:
     #     condition: service_healthy
+    profiles:
+      - dev
+      - test
 
   mysql:
     environment:
@@ -57,6 +60,24 @@ services:
       - public
     profiles:
       - test
+
+  web:
+    env_file: .env
+    build:
+      context: .
+      dockerfile: ./docker/web/Dockerfile
+    ports:
+      - 8081:8081
+    environment:
+      - API_PORT=8081
+      - DATACITE_API_URL=http://api.stage.datacite.org
+      - ANALYTICS_DATABASE_HOST=db
+    # depends_on:
+    #   - db
+    networks:
+      - public
+    profiles:
+      - prod
 
 networks:
   public:
