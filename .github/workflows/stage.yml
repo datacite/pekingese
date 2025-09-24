@@ -1,0 +1,28 @@
+name: Deploy to staging
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dockerfile: ./docker/web/Dockerfile
+            image: ghcr.io/${{ github.repository }}
+    uses: ./.github/workflows/build_docker.yml
+    with:
+      image: ${{ matrix.image }}
+      dockerfile: ${{ matrix.dockerfile }}
+
+  deploy-api:
+    needs: [build]
+    uses: ./.github/workflows/deployment.yml
+    with:
+      versionvar_filename: pekingese
+      service_name: metadata-completeness-api
+      env_name: stage
+    secrets:
+      PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}

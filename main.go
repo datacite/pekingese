@@ -8,7 +8,8 @@ import (
 )
 
 var (
-	OSAddress = os.Getenv("OPENSEARCH_ADDRESS")
+	APIPort   = os.Getenv("API_PORT")
+	OSAddress = os.Getenv("OPENSEARCH_HOST")
 	IndexName = os.Getenv("OPENSEARCH_INDEX")
 	osClient  OSClient // FOR INITIAL DEV ONLY - DO NOT USE GLOBAL IN PRODUCTION (probably)
 )
@@ -17,7 +18,7 @@ func main() {
 	osClient = InitOpenSearch()
 
 	http.HandleFunc("/", getData)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":"+APIPort, nil)
 }
 
 func getData(response http.ResponseWriter, request *http.Request) {

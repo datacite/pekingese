@@ -125,8 +125,6 @@ func ParseDistributionAgg(key string, value json.RawMessage) (*DistributionRespo
 			Percent: calcPercent(value.Count, totalCount),
 		}
 		response.Values = append(response.Values, fieldPercent)
-
-		fmt.Println(fieldPercent)
 	}
 
 	return response, nil
