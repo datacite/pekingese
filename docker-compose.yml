@@ -67,13 +67,11 @@ services:
       context: .
       dockerfile: ./docker/web/Dockerfile
     ports:
-      - 8081:8081
+      - 80:80
     environment:
-      - API_PORT=8081
+      - API_PORT=80
       - DATACITE_API_URL=http://api.stage.datacite.org
       - ANALYTICS_DATABASE_HOST=db
-    # depends_on:
-    #   - db
     networks:
       - public
     profiles:

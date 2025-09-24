@@ -5,7 +5,6 @@ COPY ${PWD} /app
 WORKDIR /app
 
 # Build the go environment
-# RUN CGO_ENABLED=0 go build -ldflags '-s -w -extldflags "-static"' -o /app/webbin ./cmd/web
 RUN CGO_ENABLED=0 go build -ldflags '-s -w -extldflags "-static"' -o /app/webbin .
 
 # Production image
@@ -21,9 +20,6 @@ USER app
 # Copy the go binary from the builder to the container
 COPY --chown=app:app --from=builder /app/webbin /home/app/webbin
 
-# Copy COUNTER robots file to the container
-COPY --chown=app:app --from=builder /app/data/COUNTER_Robots_list.json /home/app/data/COUNTER_Robots_list.json
-
 # Set the workdir to app dir
 WORKDIR /home/app/
 
@@ -31,4 +27,4 @@ WORKDIR /home/app/
 CMD ["./webbin"]
 
 # Expose the webserver
-EXPOSE 8081
+EXPOSE 80
