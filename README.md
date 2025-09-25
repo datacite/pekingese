@@ -19,7 +19,7 @@ Host es-stage
 ### Start the API
 
 1. `ssh es-stage`
-2. `docker-compose up` (in a separate terminal)
+2. `docker-compose --profile dev up` (in a separate terminal)
 
 ### Using the API
 
