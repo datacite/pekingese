@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -15,10 +16,14 @@ var (
 )
 
 func main() {
+	log.Println("Initializing OpenSearch client...")
 	osClient = InitOpenSearch()
+	log.Println("OpenSearch client initialized successfully")
 
+	log.Println("Starting API server...")
 	http.HandleFunc("/", getData)
 	http.ListenAndServe(":"+APIPort, nil)
+	log.Println("Listening on port " + APIPort)
 }
 
 func getData(response http.ResponseWriter, request *http.Request) {
