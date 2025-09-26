@@ -22,8 +22,8 @@ func main() {
 
 	log.Println("Starting API server...")
 	http.HandleFunc("/", getData)
-	http.ListenAndServe(":"+APIPort, nil)
-	log.Println("Listening on port " + APIPort)
+	err := http.ListenAndServe(":"+APIPort, nil)
+	log.Fatalf("Error starting server: %s", err)
 }
 
 func getData(response http.ResponseWriter, request *http.Request) {
