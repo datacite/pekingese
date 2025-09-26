@@ -23,7 +23,7 @@ func InitOpenSearch() OSClient {
 		Addresses: []string{OSAddress},
 	})
 	if err != nil {
-		log.Fatalf("Cannot initialize: %s", err)
+		log.Fatalf("Error initializing OpenSearch client: %s", err)
 	}
 
 	return osClient
