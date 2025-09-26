@@ -27,4 +27,4 @@ WORKDIR /home/app/
 CMD ["./webbin"]
 
 # Expose the webserver
-EXPOSE 80
+EXPOSE 8080
