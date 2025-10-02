@@ -30,16 +30,18 @@ type DistributionAggregation struct {
 // Structures for API response
 type PresentResponse struct {
 	Field   string `json:"field"`
+	Count   int    `json:"count"`
 	Percent int    `json:"percent"`
 }
 
 type DistributionResponse struct {
 	Field  string `json:"field"`
-	Values []ValuePercent
+	Values []DistributionValue
 }
 
-type ValuePercent struct {
+type DistributionValue struct {
 	Value   string `json:"value"`
+	Count   int    `json:"count"`
 	Percent int    `json:"percent"`
 }
 
@@ -96,6 +98,7 @@ func ParsePresentAgg(key string, value json.RawMessage) (*PresentResponse, error
 
 	response := &PresentResponse{
 		Field:   strings.TrimPrefix(key, "present_"),
+		Count:   presentCount,
 		Percent: calcPercent(presentCount, totalCount),
 	}
 
@@ -116,15 +119,16 @@ func ParseDistributionAgg(key string, value json.RawMessage) (*DistributionRespo
 
 	response := &DistributionResponse{
 		Field:  strings.TrimPrefix(key, "distribution_"),
-		Values: make([]ValuePercent, 0, len(distribution.Buckets)),
+		Values: make([]DistributionValue, 0, len(distribution.Buckets)),
 	}
 
 	for _, value := range distribution.Buckets {
-		fieldPercent := ValuePercent{
+		value := DistributionValue{
 			Value:   value.Value,
+			Count:   value.Count,
 			Percent: calcPercent(value.Count, totalCount),
 		}
-		response.Values = append(response.Values, fieldPercent)
+		response.Values = append(response.Values, value)
 	}
 
 	return response, nil
