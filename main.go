@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -31,6 +32,7 @@ func getData(response http.ResponseWriter, request *http.Request) {
 	query := request.URL.Query().Get("query")
 	clientId := request.URL.Query().Get("client_id")
 	providerId := request.URL.Query().Get("provider_id")
+	numDistributionResults := GetURLQueryAsUInt(request, "distribution_size", 10)
 
 	fieldsPresent := strings.Split(request.URL.Query().Get("present"), ",")
 	fieldsDistribution := strings.Split(request.URL.Query().Get("distribution"), ",")
@@ -46,7 +48,7 @@ func getData(response http.ResponseWriter, request *http.Request) {
 	distributionAggs := make([]OSAggregation, 0)
 	for _, field := range fieldsDistribution {
 		if field != "" {
-			distributionAggs = append(distributionAggs, buildDistributionAggregation(field, 10))
+			distributionAggs = append(distributionAggs, buildDistributionAggregation(field, numDistributionResults))
 		}
 	}
 
@@ -66,4 +68,18 @@ func getData(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
 	response.WriteHeader(http.StatusOK)
 	json.NewEncoder(response).Encode(apiResponse)
+}
+
+func GetURLQueryAsUInt(request *http.Request, param string, defaultValue uint64) uint64 {
+	valueStr := request.URL.Query().Get(param)
+	if valueStr == "" {
+		return defaultValue
+	}
+
+	value, err := strconv.ParseUint(valueStr, 10, 64)
+	if err != nil {
+		return defaultValue
+	}
+
+	return value
 }
