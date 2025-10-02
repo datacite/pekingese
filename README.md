@@ -36,6 +36,7 @@ http://localhost:8080/?client_id=datacite.datacite&present=creators,creators.nam
 - `query`: string
 - `present`: []string - _comma separated list of fields for which to fetch the present/absent counts_
 - `distribution`: []string - _comma separated list of fields for which to fetch the distribution values_
+- `distribution_size`: number - _specifies the number of top results to return for each distribution field_
 
 ---
 
