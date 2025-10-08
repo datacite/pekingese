@@ -29,9 +29,10 @@ type DistributionAggregation struct {
 
 // Structures for API response
 type PresentResponse struct {
-	Field   string `json:"field"`
-	Count   int    `json:"count"`
-	Percent int    `json:"percent"`
+	Field   string  `json:"field"`
+	Count   int     `json:"count"`
+	Absent  int     `json:"absent_count"`
+	Percent float32 `json:"percent"`
 }
 
 type DistributionResponse struct {
@@ -40,9 +41,9 @@ type DistributionResponse struct {
 }
 
 type DistributionValue struct {
-	Value   string `json:"value"`
-	Count   int    `json:"count"`
-	Percent int    `json:"percent"`
+	Value   string  `json:"value"`
+	Count   int     `json:"count"`
+	Percent float32 `json:"percent"`
 }
 
 type APIResponse struct {
@@ -94,11 +95,14 @@ func ParsePresentAgg(key string, value json.RawMessage) (*PresentResponse, error
 		return nil, fmt.Errorf("unmarshal present aggregation %s: %w", key, err)
 	}
 
-	presentCount, totalCount := present.Buckets.Present.Count, present.Buckets.Present.Count+present.Buckets.Absent.Count
+	presentCount := present.Buckets.Present.Count
+	absentCount := present.Buckets.Absent.Count
+	totalCount := presentCount + absentCount
 
 	response := &PresentResponse{
 		Field:   strings.TrimPrefix(key, "present_"),
 		Count:   presentCount,
+		Absent:  absentCount,
 		Percent: calcPercent(presentCount, totalCount),
 	}
 
@@ -134,9 +138,9 @@ func ParseDistributionAgg(key string, value json.RawMessage) (*DistributionRespo
 	return response, nil
 }
 
-func calcPercent(part, total int) int {
+func calcPercent(part, total int) float32 {
 	if total == 0 {
 		return 0
 	}
-	return part * 100 / total
+	return float32(part) * 100 / float32(total)
 }
