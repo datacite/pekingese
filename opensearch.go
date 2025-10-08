@@ -30,20 +30,13 @@ func InitOpenSearch() OSClient {
 }
 
 func BuildBaseQuery(clientId string, providerId string, query string) *osquery.SearchRequest {
-	// setup search query
-	search := osquery.Search().
-		Size(0).
-		Query(
-			osquery.Bool().
-				Filter(
-					osquery.Term("agency", "datacite"),
-					osquery.Term("aasm_state", "findable"),
-				),
-		)
+	// set up base filters
+	filters := []osquery.Mappable{
+		osquery.Term("agency", "datacite"),
+		osquery.Term("aasm_state", "findable"),
+	}
 
-	// apply filters conditionally
-	filters := make([]osquery.Mappable, 0)
-
+	// apply conditional filters
 	if clientId != "" {
 		filters = append(filters, osquery.Term("client.id", clientId))
 	}
@@ -56,11 +49,9 @@ func BuildBaseQuery(clientId string, providerId string, query string) *osquery.S
 		filters = append(filters, buildQueryString(query))
 	}
 
-	search.Query(
+	return osquery.Search().Size(0).Query(
 		osquery.Bool().Filter(filters...),
 	)
-
-	return search
 }
 
 func BuildPresentQuery(field string, clientId string, providerId string, query string) *osquery.SearchRequest {
