@@ -22,6 +22,9 @@ func main() {
 	log.Println("OpenSearch client initialized successfully")
 
 	log.Println("Starting API server...")
+	http.HandleFunc("/heartbeat", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("ok"))
+	})
 	http.HandleFunc("/", getData)
 	err := http.ListenAndServe(":"+APIPort, nil)
 	log.Fatalf("Error starting server: %s", err)
