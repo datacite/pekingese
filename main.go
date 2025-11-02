@@ -22,12 +22,20 @@ func main() {
 	log.Println("OpenSearch client initialized successfully")
 
 	log.Println("Starting API server...")
-	http.HandleFunc("/heartbeat", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("ok"))
-	})
-	http.HandleFunc("/", getData)
-	err := http.ListenAndServe(":"+APIPort, nil)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/heartbeat", heartbeat)
+	mux.HandleFunc("/", getData)
+
+	// Apply CORS middleware
+	handler := corsMiddleware(mux)
+
+	log.Println("Server starting on :" + APIPort)
+	err := http.ListenAndServe(":"+APIPort, handler)
 	log.Fatalf("Error starting server: %s", err)
+}
+
+func heartbeat(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("ok"))
 }
 
 func getData(response http.ResponseWriter, request *http.Request) {
@@ -85,4 +93,20 @@ func GetURLQueryAsUInt(request *http.Request, param string, defaultValue uint64)
 	}
 
 	return value
+}
+
+// https://www.stackhawk.com/blog/golang-cors-guide-what-it-is-and-how-to-enable-it/#h-using-middleware-for-better-organization
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
