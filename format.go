@@ -36,8 +36,8 @@ type PresentResponse struct {
 }
 
 type DistributionResponse struct {
-	Field  string `json:"field"`
-	Values []DistributionValue
+	Field  string              `json:"field"`
+	Values []DistributionValue `json:"values"`
 }
 
 type DistributionValue struct {
