@@ -54,20 +54,6 @@ func BuildBaseQuery(clientId string, providerId string, query string) *osquery.S
 	)
 }
 
-func BuildPresentQuery(field string, clientId string, providerId string, query string) *osquery.SearchRequest {
-	search := BuildBaseQuery(clientId, providerId, query)
-	presentAgg := buildPresentAggregation(field)
-
-	return search.Aggs(presentAgg)
-}
-
-func BuildDistributionQuery(field string, clientId string, providerId string, query string, size uint64) *osquery.SearchRequest {
-	search := BuildBaseQuery(clientId, providerId, query)
-	distributionAgg := buildDistributionAggregation(field, size)
-
-	return search.Aggs(distributionAgg)
-}
-
 func buildQueryString(query string) *osquery.CustomQueryMap {
 	queryString := map[string]any{
 		"query_string": map[string]any{
