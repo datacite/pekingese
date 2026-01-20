@@ -43,6 +43,7 @@ func getData(response http.ResponseWriter, request *http.Request) {
 	query := request.URL.Query().Get("query")
 	clientId := request.URL.Query().Get("client_id")
 	providerId := request.URL.Query().Get("provider_id")
+	consortiumId := request.URL.Query().Get("consortium_id")
 	numDistributionResults := GetURLQueryAsUInt(request, "distribution_size", 10)
 
 	fieldsPresent := strings.Split(request.URL.Query().Get("present"), ",")
@@ -63,7 +64,7 @@ func getData(response http.ResponseWriter, request *http.Request) {
 		}
 	}
 
-	search := BuildBaseQuery(clientId, providerId, query)
+	search := BuildBaseQuery(clientId, providerId, consortiumId, query)
 	search = search.
 		Aggs(presentAggs...).
 		Aggs(distributionAggs...)

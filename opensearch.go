@@ -29,7 +29,7 @@ func InitOpenSearch() OSClient {
 	return osClient
 }
 
-func BuildBaseQuery(clientId string, providerId string, query string) *osquery.SearchRequest {
+func BuildBaseQuery(clientId string, providerId string, consortiumId string, query string) *osquery.SearchRequest {
 	// set up base filters
 	filters := []osquery.Mappable{
 		osquery.Term("agency", "datacite"),
@@ -43,6 +43,10 @@ func BuildBaseQuery(clientId string, providerId string, query string) *osquery.S
 
 	if providerId != "" {
 		filters = append(filters, osquery.Term("provider.id", providerId))
+	}
+
+	if consortiumId != "" {
+		filters = append(filters, osquery.Term("consortium_id", consortiumId))
 	}
 
 	if query != "" {
