@@ -33,6 +33,7 @@ http://localhost:8080/?client_id=datacite.datacite&present=creators,creators.nam
 
 - `client_id`: string
 - `provider_id`: string
+- `consortium_id`: string
 - `query`: string
 - `present`: []string - _comma separated list of fields for which to fetch the present/absent counts_
 - `distribution`: []string - _comma separated list of fields for which to fetch the distribution values_

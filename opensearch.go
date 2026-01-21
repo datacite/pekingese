@@ -29,7 +29,7 @@ func InitOpenSearch() OSClient {
 	return osClient
 }
 
-func BuildBaseQuery(clientId string, providerId string, query string) *osquery.SearchRequest {
+func BuildBaseQuery(clientId string, providerId string, consortiumId string, query string) *osquery.SearchRequest {
 	// set up base filters
 	filters := []osquery.Mappable{
 		osquery.Term("agency", "datacite"),
@@ -45,6 +45,10 @@ func BuildBaseQuery(clientId string, providerId string, query string) *osquery.S
 		filters = append(filters, osquery.Term("provider.id", providerId))
 	}
 
+	if consortiumId != "" {
+		filters = append(filters, osquery.Term("consortium_id", consortiumId))
+	}
+
 	if query != "" {
 		filters = append(filters, buildQueryString(query))
 	}
@@ -52,20 +56,6 @@ func BuildBaseQuery(clientId string, providerId string, query string) *osquery.S
 	return osquery.Search().Size(0).Query(
 		osquery.Bool().Filter(filters...),
 	)
-}
-
-func BuildPresentQuery(field string, clientId string, providerId string, query string) *osquery.SearchRequest {
-	search := BuildBaseQuery(clientId, providerId, query)
-	presentAgg := buildPresentAggregation(field)
-
-	return search.Aggs(presentAgg)
-}
-
-func BuildDistributionQuery(field string, clientId string, providerId string, query string, size uint64) *osquery.SearchRequest {
-	search := BuildBaseQuery(clientId, providerId, query)
-	distributionAgg := buildDistributionAggregation(field, size)
-
-	return search.Aggs(distributionAgg)
 }
 
 func buildQueryString(query string) *osquery.CustomQueryMap {
