@@ -1,7 +1,7 @@
 name: Deploy to production
 on:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   build:
@@ -22,6 +22,6 @@ jobs:
     with:
       versionvar_filename: pekingese
       service_name: metadata-completeness-api
-      env_name: production
+      env_name: prod-eu-west
     secrets:
       PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
