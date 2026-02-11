@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/defensestation/osquery/v2"
 	"github.com/opensearch-project/opensearch-go/v4"
@@ -59,13 +60,62 @@ func BuildBaseQuery(clientId string, providerId string, consortiumId string, que
 }
 
 func buildQueryString(query string) *osquery.CustomQueryMap {
+	// Transform field names from camelCase to snake_case to match OpenSearch index
+	transformedQuery := transformQueryFieldNames(query)
+
 	queryString := map[string]any{
 		"query_string": map[string]any{
-			"query": query,
+			"query": transformedQuery,
 		},
 	}
 
 	return osquery.CustomQuery(queryString)
+}
+
+// transformQueryFieldNames converts camelCase field names to snake_case
+// to match the field names used in the OpenSearch index
+func transformQueryFieldNames(query string) string {
+	if query == "" {
+		return query
+	}
+
+	// Import strings package for replacements
+	result := query
+
+	// Field name transformations (matching lupo implementation)
+	result = strings.ReplaceAll(result, "publicationYear", "publication_year")
+	result = strings.ReplaceAll(result, "relatedIdentifiers", "related_identifiers")
+	result = strings.ReplaceAll(result, "relatedItems", "related_items")
+	result = strings.ReplaceAll(result, "rightsList", "rights_list")
+	result = strings.ReplaceAll(result, "fundingReferences", "funding_references")
+	result = strings.ReplaceAll(result, "geoLocations", "geo_locations")
+	result = strings.ReplaceAll(result, "version:", "version_info:")
+	result = strings.ReplaceAll(result, "landingPage", "landing_page")
+	result = strings.ReplaceAll(result, "contentUrl", "content_url")
+	result = strings.ReplaceAll(result, "citationCount", "citation_count")
+	result = strings.ReplaceAll(result, "viewCount", "view_count")
+	result = strings.ReplaceAll(result, "downloadCount", "download_count")
+	result = strings.ReplaceAll(result, "schemaVersion", "schema_version")
+
+	// Handle publisher nested fields
+	// publisher.name -> publisher_obj.name
+	// publisher.publisherIdentifier -> publisher_obj.publisherIdentifier
+	// etc.
+	publisherFields := []string{
+		"publisher.name",
+		"publisher.publisherIdentifier",
+		"publisher.publisherIdentifierScheme",
+		"publisher.schemeUri",
+		"publisher.lang",
+	}
+	for _, field := range publisherFields {
+		result = strings.ReplaceAll(result, field, strings.Replace(field, "publisher.", "publisher_obj.", 1))
+	}
+
+	// Escape forward slashes for OpenSearch query syntax
+	result = strings.ReplaceAll(result, "/", "\\/")
+
+	return result
 }
 
 func buildPresentAggregation(field string) OSAggregation {
