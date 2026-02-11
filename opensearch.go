@@ -79,7 +79,6 @@ func transformQueryFieldNames(query string) string {
 		return query
 	}
 
-	// Import strings package for replacements
 	result := query
 
 	// Field name transformations (matching lupo implementation)
@@ -89,6 +88,8 @@ func transformQueryFieldNames(query string) string {
 	result = strings.ReplaceAll(result, "rightsList", "rights_list")
 	result = strings.ReplaceAll(result, "fundingReferences", "funding_references")
 	result = strings.ReplaceAll(result, "geoLocations", "geo_locations")
+	// Note: version: includes colon to avoid transforming "version" in other contexts
+	// as "version" is a reserved field in OpenSearch
 	result = strings.ReplaceAll(result, "version:", "version_info:")
 	result = strings.ReplaceAll(result, "landingPage", "landing_page")
 	result = strings.ReplaceAll(result, "contentUrl", "content_url")
@@ -113,6 +114,7 @@ func transformQueryFieldNames(query string) string {
 	}
 
 	// Escape forward slashes for OpenSearch query syntax
+	// This is done last to ensure proper escaping of all forward slashes in the query
 	result = strings.ReplaceAll(result, "/", "\\/")
 
 	return result
