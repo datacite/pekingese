@@ -40,7 +40,7 @@ var camelCaseToSnakeCaseFieldsRegex = []struct {
 	regex     string
 	snakeCase string
 }{
-	{`(publisher\.)(name|publisherIdentifier|publisherIdentifierScheme|schemeUri|lang)`, "publisher_obj.$2"},
+	{`(publisher\.)(name|publisherIdentifierScheme|publisherIdentifier|schemeUri|lang)`, "publisher_obj.$2"},
 }
 
 func InitOpenSearch() OSClient {
