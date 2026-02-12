@@ -66,15 +66,15 @@ func BuildBaseQuery(clientId string, providerId string, consortiumId string, que
 
 	// apply conditional filters
 	if clientId != "" {
-		filters = append(filters, osquery.Term("client.id", clientId))
+		filters = append(filters, osquery.Term("client.id", strings.ToLower(clientId)))
 	}
 
 	if providerId != "" {
-		filters = append(filters, osquery.Term("provider.id", providerId))
+		filters = append(filters, osquery.Term("provider.id", strings.ToLower(providerId)))
 	}
 
 	if consortiumId != "" {
-		filters = append(filters, osquery.Term("consortium_id", consortiumId))
+		filters = append(filters, osquery.Term("consortium_id", strings.ToLower(consortiumId)))
 	}
 
 	if query != "" {
