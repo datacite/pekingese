@@ -17,25 +17,30 @@ type OSClient = *opensearch.Client
 type OSAggregation = osquery.Aggregation
 type OSResponse = *opensearchapi.SearchResp
 
-var camelCaseToSnakeCaseFields = map[string]string{
-	"publicationYear":    "publication_year",
-	"relatedIdentifiers": "related_identifiers",
-	"relatedItems":       "related_items",
-	"rightsList":         "rights_list",
-	"fundingReferences":  "funding_references",
-	"geoLocations":       "geo_locations",
-	"version:":           "version_info:",
-	"landingPage":        "landing_page",
-	"contentUrl":         "content_url",
-	"citationCount":      "citation_count",
-	"viewCount":          "view_count",
-	"downloadCount":      "download_count",
-	"schemaVersion":      "schema_version",
-	"/":                  "\\/",
+var camelCaseToSnakeCaseFields = []struct {
+	camelCase string
+	snakeCase string
+}{
+	{"publicationYear", "publication_year"},
+	{"relatedIdentifiers", "related_identifiers"},
+	{"relatedItems", "related_items"},
+	{"rightsList", "rights_list"},
+	{"fundingReferences", "funding_references"},
+	{"geoLocations", "geo_locations"},
+	{"version:", "version_info:"},
+	{"landingPage", "landing_page"},
+	{"contentUrl", "content_url"},
+	{"citationCount", "citation_count"},
+	{"viewCount", "view_count"},
+	{"downloadCount", "download_count"},
+	{"schemaVersion", "schema_version"},
 }
 
-var camelCaseToSnakeCaseFieldsRegex = map[string]string{
-	`(publisher\.)(name|publisherIdentifier|publisherIdentifierScheme|schemeUri|lang)`: "publisher_obj.$2",
+var camelCaseToSnakeCaseFieldsRegex = []struct {
+	regex     string
+	snakeCase string
+}{
+	{`(publisher\.)(name|publisherIdentifierScheme|publisherIdentifier|schemeUri|lang)`, "publisher_obj.$2"},
 }
 
 func InitOpenSearch() OSClient {
@@ -83,13 +88,15 @@ func BuildBaseQuery(clientId string, providerId string, consortiumId string, que
 
 func buildQueryString(query string) *osquery.CustomQueryMap {
 	// support camel case for certain fields for consistency with lupo
-	for camelCase, snakeCase := range camelCaseToSnakeCaseFields {
-		query = strings.ReplaceAll(query, camelCase, snakeCase)
+	for _, field := range camelCaseToSnakeCaseFields {
+		query = strings.ReplaceAll(query, field.camelCase, field.snakeCase)
 	}
 
-	for regex, field := range camelCaseToSnakeCaseFieldsRegex {
-		query = regexp.MustCompile(regex).ReplaceAllString(query, field)
+	for _, field := range camelCaseToSnakeCaseFieldsRegex {
+		query = regexp.MustCompile(field.regex).ReplaceAllString(query, field.snakeCase)
 	}
+
+	query = strings.ReplaceAll(query, "/", "\\/")
 
 	queryString := map[string]any{
 		"query_string": map[string]any{
