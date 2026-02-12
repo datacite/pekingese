@@ -5,6 +5,8 @@ import (
 	"crypto/tls"
 	"log"
 	"net/http"
+	"regexp"
+	"strings"
 
 	"github.com/defensestation/osquery/v2"
 	"github.com/opensearch-project/opensearch-go/v4"
@@ -14,6 +16,27 @@ import (
 type OSClient = *opensearch.Client
 type OSAggregation = osquery.Aggregation
 type OSResponse = *opensearchapi.SearchResp
+
+var camelCaseToSnakeCaseFields = map[string]string{
+	"publicationYear":    "publication_year",
+	"relatedIdentifiers": "related_identifiers",
+	"relatedItems":       "related_items",
+	"rightsList":         "rights_list",
+	"fundingReferences":  "funding_references",
+	"geoLocations":       "geo_locations",
+	"version:":           "version_info:",
+	"landingPage":        "landing_page",
+	"contentUrl":         "content_url",
+	"citationCount":      "citation_count",
+	"viewCount":          "view_count",
+	"downloadCount":      "download_count",
+	"schemaVersion":      "schema_version",
+	"/":                  "\\/",
+}
+
+var camelCaseToSnakeCaseFieldsRegex = map[*regexp.Regexp]string{
+	regexp.MustCompile(`(publisher\.)(name|publisherIdentifier|publisherIdentifierScheme|schemeUri|lang)`): "publisher_obj.$2",
+}
 
 func InitOpenSearch() OSClient {
 	osClient, err := opensearch.NewClient(opensearch.Config{
@@ -59,6 +82,15 @@ func BuildBaseQuery(clientId string, providerId string, consortiumId string, que
 }
 
 func buildQueryString(query string) *osquery.CustomQueryMap {
+	// support camel case for certain fields for consistency with lupo
+	for camelCase, snakeCase := range camelCaseToSnakeCaseFields {
+		query = strings.ReplaceAll(query, camelCase, snakeCase)
+	}
+
+	for regex, field := range camelCaseToSnakeCaseFieldsRegex {
+		query = regex.ReplaceAllString(query, field)
+	}
+
 	queryString := map[string]any{
 		"query_string": map[string]any{
 			"query": query,
