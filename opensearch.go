@@ -34,7 +34,6 @@ var camelCaseToSnakeCaseFields = []struct {
 	{"viewCount", "view_count"},
 	{"downloadCount", "download_count"},
 	{"schemaVersion", "schema_version"},
-	{"/", "\\/"},
 }
 
 var camelCaseToSnakeCaseFieldsRegex = []struct {
@@ -96,6 +95,8 @@ func buildQueryString(query string) *osquery.CustomQueryMap {
 	for _, field := range camelCaseToSnakeCaseFieldsRegex {
 		query = regexp.MustCompile(field.regex).ReplaceAllString(query, field.snakeCase)
 	}
+
+	query = strings.ReplaceAll(query, "/", "\\/")
 
 	queryString := map[string]any{
 		"query_string": map[string]any{
