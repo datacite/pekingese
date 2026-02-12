@@ -34,8 +34,8 @@ var camelCaseToSnakeCaseFields = map[string]string{
 	"/":                  "\\/",
 }
 
-var camelCaseToSnakeCaseFieldsRegex = map[*regexp.Regexp]string{
-	regexp.MustCompile(`(publisher\.)(name|publisherIdentifier|publisherIdentifierScheme|schemeUri|lang)`): "publisher_obj.$2",
+var camelCaseToSnakeCaseFieldsRegex = map[string]string{
+	`(publisher\.)(name|publisherIdentifier|publisherIdentifierScheme|schemeUri|lang)`: "publisher_obj.$2",
 }
 
 func InitOpenSearch() OSClient {
@@ -88,7 +88,7 @@ func buildQueryString(query string) *osquery.CustomQueryMap {
 	}
 
 	for regex, field := range camelCaseToSnakeCaseFieldsRegex {
-		query = regex.ReplaceAllString(query, field)
+		query = regexp.MustCompile(regex).ReplaceAllString(query, field)
 	}
 
 	queryString := map[string]any{
